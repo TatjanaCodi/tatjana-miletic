@@ -6,8 +6,98 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
+    "gift_guide_hero_aEMqeP": {
+      "type": "gift-guide-hero",
+      "name": "Gift guide hero",
+      "settings": {
+        "header_logo_text": "TISSO VISON",
+        "header_logo_link": "",
+        "header_tagline": "Find the ideal gift for your loved ones.",
+        "header_button_label": "CHOOSE GIFT",
+        "header_button_link": "shopify://collections/all",
+        "header_button_open_new_tab": false,
+        "mobile_min_height": 520,
+        "desktop_min_height": 880,
+        "heading": "The Gift Guide",
+        "description": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season.",
+        "button_label": "SHOP NOW",
+        "button_link": "shopify://collections",
+        "button_open_new_tab": false,
+        "desktop_content_alignment": "left",
+        "banner_text": "SUSTAINABLE, ETHICALLY MADE ACTIVEWEAR"
+      }
+    },
+    "vision_in_the_wild_kErB3f": {
+      "type": "vision-in-the-wild",
+      "blocks": {
+        "item_EexTfY": {
+          "type": "item",
+          "settings": {
+            "product": "black-leather-bag",
+            "spot_position_x": 67,
+            "spot_position_y": 13
+          }
+        },
+        "item_DBKDwx": {
+          "type": "item",
+          "settings": {
+            "product": "blue-silk-tuxedo",
+            "spot_position_x": 78,
+            "spot_position_y": 63
+          }
+        },
+        "item_yL9D3r": {
+          "type": "item",
+          "settings": {
+            "product": "chequered-red-shirt",
+            "spot_position_x": 50,
+            "spot_position_y": 50
+          }
+        },
+        "item_dLd7TA": {
+          "type": "item",
+          "settings": {
+            "product": "classic-leather-jacket",
+            "spot_position_x": 50,
+            "spot_position_y": 50
+          }
+        },
+        "item_UEeQFD": {
+          "type": "item",
+          "settings": {
+            "product": "classic-varsity-top",
+            "spot_position_x": 50,
+            "spot_position_y": 50
+          }
+        },
+        "item_4FcMUH": {
+          "type": "item",
+          "settings": {
+            "product": "dark-denim-top",
+            "spot_position_x": 50,
+            "spot_position_y": 21
+          }
+        }
+      },
+      "block_order": [
+        "item_EexTfY",
+        "item_DBKDwx",
+        "item_yL9D3r",
+        "item_dLd7TA",
+        "item_UEeQFD",
+        "item_4FcMUH"
+      ],
+      "name": "Vision in the wild",
+      "settings": {
+        "heading": "Tisso vison in the wild",
+        "bundle_product": "dark-winter-jacket",
+        "bundle_trigger_color": "Black",
+        "bundle_trigger_size": "Medium"
+      }
+    },
     "hero_jVaWmY": {
       "type": "hero",
       "blocks": {
@@ -57,6 +147,7 @@
         "text_YLPk4p",
         "button_H9gpTf"
       ],
+      "disabled": true,
       "name": "t:names.hero",
       "settings": {
         "media_type_1": "image",
@@ -65,6 +156,7 @@
         "custom_mobile_media": false,
         "media_type_1_mobile": "image",
         "media_type_2_mobile": "image",
+        "link": "",
         "open_in_new_tab": false,
         "content_direction": "column",
         "vertical_on_mobile": true,
@@ -261,6 +353,7 @@
           ]
         }
       },
+      "disabled": true,
       "name": "Featured collection",
       "settings": {
         "collection": "all",
@@ -284,6 +377,8 @@
     }
   },
   "order": [
+    "gift_guide_hero_aEMqeP",
+    "vision_in_the_wild_kErB3f",
     "hero_jVaWmY",
     "product_list_fa6P9H"
   ]
