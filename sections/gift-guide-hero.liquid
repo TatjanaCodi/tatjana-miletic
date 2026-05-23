@@ -282,9 +282,10 @@
   .gg-hero__topbar-tagline--desktop {
     display: none;
     margin: 0;
-    font-size: 1rem;
+    font-size: 16px;
     font-weight: 400;
-    line-height: 1.4;
+    line-height: 13.424px;
+    letter-spacing: 0;
     color: #000;
     text-align: center;
   }
@@ -476,9 +477,10 @@
 
   .gg-hero__heading {
     margin: 0;
-    font-size: clamp(1.875rem, 8vw, 2.75rem);
-    font-weight: 700;
-    line-height: 1.1;
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0;
     color: #000;
   }
 
@@ -486,7 +488,8 @@
     margin: 0;
     font-size: 16px;
     font-weight: 400;
-    line-height: 1.45;
+    line-height: 1.3;
+    letter-spacing: 0;
     color: #000;
   }
 
@@ -495,14 +498,16 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.625rem;
-    min-height: 2.75rem;
-    padding: 0.75rem 1.5rem;
+    gap: 10px;
+    min-height: 45px;
+    padding: 13px 20px;
     background: #000;
     color: #fff;
     text-decoration: none;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 400;
+    line-height: 1.28;
+    letter-spacing: 0;
     text-transform: uppercase;
     border: none;
     cursor: pointer;
@@ -567,11 +572,12 @@
   .gg-hero__banner-text {
     margin: 0;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 400;
     text-transform: uppercase;
     text-align: center;
     color: #000;
-    line-height: 1.4;
+    line-height: 13.424px;
+    letter-spacing: 0;
   }
 
   @media screen and (min-width: 750px) {
@@ -620,6 +626,7 @@
       grid-area: button;
       justify-self: end;
       min-width: auto;
+      width: 207px;
     }
 
     .gg-hero__mobile-menu {
@@ -664,6 +671,8 @@
 
     .gg-hero__content .gg-hero__button {
       margin-top: 0;
+      width: 100%;
+        max-width: 220px;
     }
 
     .gg-hero__content--desktop-center {
@@ -687,20 +696,25 @@
     }
 
     .gg-hero__heading {
-      font-size: 4.375rem;
+      font-size: 70px;
+      font-weight: 500;
+      line-height: 1;
     }
 
     .gg-hero__description {
-      font-size: 1.25rem;
-      max-width: 30rem;
+      font-size: 20px;
+      line-height: 1.4;
+      max-width: 30.1875rem;
     }
 
     .gg-hero__button {
-      font-size: 1rem;
+      font-size: 16px;
+      line-height: 1.28;
     }
 
     .gg-hero__banner-text {
-      font-size: 1rem;
+      font-size: 16px;
+      line-height: 13.424px;
     }
   }
 {% endstylesheet %}

@@ -280,7 +280,8 @@
 </section>
 
 {% stylesheet %}
-  @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,400;0,500;0,600;0,700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,600;0,700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Lustria&display=swap');
 
   .viw {
     width: 100%;
@@ -296,10 +297,12 @@
   }
 
   .viw__heading {
-    margin: 0 0 1.75rem;
-    font-size: clamp(1.5rem, 5vw, 2rem);
+    margin: 0 auto 20px;
+    font-family: 'Lustria', serif;
+    font-size: 24px;
     font-weight: 400;
     line-height: 1.2;
+    letter-spacing: 0;
     text-align: center;
     color: #000;
   }
@@ -309,7 +312,7 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 4px;
     width: 100%;
-    max-width: 177.75rem;
+    max-width: 342px;
     margin: 0 auto;
   }
 
@@ -319,7 +322,7 @@
 
   .viw__media {
     position: relative;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 169 / 186.42;
     overflow: hidden;
     background: #f7f7f7;
   }
@@ -418,42 +421,45 @@
   .viw__popup-panel {
     position: relative;
     z-index: 1;
-    width: 360px;
-    max-width: min(360px, calc(100vw - 2.5rem));
+    width: 311px;
+    max-width: min(311px, calc(100vw - 2.5rem));
     max-height: calc(100vh - 2.5rem);
     overflow: auto;
     overflow-x: hidden;
     background: #fff;
-    padding: 16px;
+    padding: 20px;
     box-sizing: border-box;
-    border: 1px solid #e3e3e3;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border: none;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
   }
 
   .viw__popup-header,
   .viw__variants,
   .viw__form {
     width: 100%;
-    max-width: none;
-    margin-inline: 0;
+    max-width: 271px;
+    margin-inline: auto;
   }
 
   .viw__popup-close {
-    
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 12px;
-    height: 12px;
+    width: 17px;
+    height: 17px;
     padding: 0;
     border: none;
     background: transparent;
-    font-size: 24px;
+    font-size: 17px;
     font-weight: 300;
     line-height: 1;
+    letter-spacing: 0;
     cursor: pointer;
     color: #000;
-    float: right;
   }
 
   .viw__popup-close span {
@@ -464,9 +470,9 @@
   .viw__popup-header {
     display: grid;
     grid-template-columns: 120px minmax(0, 1fr);
-    gap: 12px;
+    gap: 8px;
     align-items: start;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
 
   .viw__popup-media {
@@ -488,32 +494,36 @@
 
   .viw__popup-info {
     min-width: 0;
-    padding-right: 1.5rem;
-    padding-top: 12px;
+    padding-top: 13px;
+    padding-right: 18px;
   }
 
   .viw__popup-title {
     margin: 0;
-    padding-right: 0.5rem;
+    padding-right: 0;
     font-size: 16px;
     font-weight: 300;
-    line-height: 120%;
+    line-height: 1.2;
+    letter-spacing: 0;
     color: #000;
   }
 
   .viw__popup-price {
-    margin: 1.5rem 0 0;
+    margin: 20px 0 0;
+    font-family: 'Lustria', serif;
     font-size: 16px;
     font-weight: 400;
-    line-height: 120%;
+    line-height: 1.2;
+    letter-spacing: 0;
     color: #000;
   }
 
   .viw__popup-description {
-    margin: 8px 0 0;
+    margin: 12px 0 0;
     font-size: 14px;
-    font-weight: 400;
-    line-height: 110%;
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.14px;
     color: #333;
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -525,7 +535,7 @@
   .viw__variants {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     margin-bottom: 0;
   }
 
@@ -542,10 +552,12 @@
   }
 
   .viw__variant-label {
-    margin: 0 0 0.5rem;
+    margin: 0 0 5px;
     font-size: 14px;
-    font-weight: 500;
-    color: #000;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: 0;
+    color: #333;
   }
 
   .viw__variant-options {
@@ -562,7 +574,7 @@
     flex-wrap: nowrap;
     gap: 0;
     width: 100%;
-    border: 1px solid #000;
+    border: 0.5px solid #000;
     border-radius: 0;
     overflow: hidden;
     isolation: isolate;
@@ -597,11 +609,12 @@
     border: none;
     border-radius: 0;
     box-shadow: none;
+    background: #fff;
     color: #000;
   }
 
   .viw__variant-options--color .viw__color-option:not(:last-child) {
-    border-right: 1px solid #000;
+    border-right: 0.5px solid #000;
   }
 
   .viw__color-swatch {
@@ -615,18 +628,21 @@
   .viw__variant-options--color .viw__color-option.is-selected {
     background: #000;
     color: #fff;
-    font-weight: 500;
+    font-weight: 400;
   }
 
   .viw__color-option .viw__variant-option-label {
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: center;
-    min-height: 44px;
-    padding: 0.5rem 0.75rem;
+    justify-content: flex-start;
+    min-height: 39px;
+    padding: 0 12px 0 14px;
     font-size: 18px;
-    line-height: 1.2;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.36px;
+    text-transform: capitalize;
   }
 
   .viw__variant-option:not(.viw__color-option).is-selected {
@@ -648,14 +664,16 @@
     display: flex;
     align-items: stretch;
     width: 100%;
-    min-height: 45px;
+    min-height: 36px;
     padding: 0;
-    border: 1px solid #000;
+    border: 0.5px solid #000;
     background: #fff;
     color: #000;
     font-family: inherit;
     font-size: 16px;
-    letter-spacing: 0;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.32px;
     cursor: pointer;
     text-align: left;
   }
@@ -669,19 +687,19 @@
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     min-width: 0;
-    padding: 0.625rem 0.875rem;
+    padding: 0 12px;
   }
 
   .viw__size-picker-value.is-placeholder {
-    color: #9e9e9e;
+    color: #000;
   }
 
   .viw__size-picker-chevron {
     flex-shrink: 0;
-    width: 44px;
-    border-left: 1px solid #000;
+    width: 36px;
+    border-left: 0.5px solid #000;
     position: relative;
   }
 
@@ -713,7 +731,7 @@
     margin: 0;
     padding: 0;
     list-style: none;
-    border: 1px solid #000;
+    border: 0.5px solid #000;
     border-top: none;
     background: #fff;
     box-sizing: border-box;
@@ -733,20 +751,22 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 45px;
-    padding: 0.625rem 0.875rem;
+    min-height: 36px;
+    padding: 0 12px;
     border: none;
     background: #fff;
     color: #000;
     font-family: inherit;
     font-size: 16px;
-    letter-spacing: 0;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.32px;
     cursor: pointer;
     text-align: center;
   }
 
   .viw__size-picker-item--placeholder .viw__size-picker-option {
-    color: #9e9e9e;
+    color: #000;
     cursor: default;
   }
 
@@ -772,7 +792,7 @@
   }
 
   .viw__form {
-    margin: 60px 0 0;
+    margin: 51px 0 0;
   }
 
   .viw__submit {
@@ -781,14 +801,15 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    min-height: 3rem;
-    padding: 0.75rem 1rem;
+    min-height: 45px;
+    padding: 12px 20px;
     border: none;
     background: #000;
     color: #fff;
     font-family: inherit;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 400;
+    line-height: 1.28;
     letter-spacing: 0;
     text-transform: uppercase;
     cursor: pointer;
@@ -850,17 +871,25 @@
 
   @media screen and (min-width: 750px) {
     .viw {
-      padding: 3rem clamp(2rem, 5vw, 4rem);
+      padding: 3.125rem clamp(3.25rem, 5vw, 4rem);
     }
 
     .viw__heading {
-      margin-bottom: 2.25rem;
+      width: 100%;
+      max-width: 1339px;
+      margin: 0 auto 30px;
+      font-size: 36px;
       text-align: left;
     }
 
     .viw__grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 4px;
+      gap: 20px;
+      max-width: 1339px;
+    }
+
+    .viw__media {
+      aspect-ratio: 433 / 444;
     }
 
     .viw__spot {
@@ -868,6 +897,10 @@
       height: 22px;
     }
 
+    .viw__spot-icon {
+      width: 0.625rem;
+      height: 0.625rem;
+    }
   }
 {% endstylesheet %}
 
