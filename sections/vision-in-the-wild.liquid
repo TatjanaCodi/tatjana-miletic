@@ -1,0 +1,971 @@
+<script src="{{ 'vision-in-the-wild.js' | asset_url }}" defer></script>
+
+{%- liquid
+  assign bundle_product = section.settings.bundle_product
+  assign bundle_variant = nil
+  assign bundle_trigger_color = section.settings.bundle_trigger_color | downcase | strip
+  assign bundle_trigger_size = section.settings.bundle_trigger_size | downcase | strip
+
+  if bundle_product != blank
+    for variant in bundle_product.variants
+      if variant.available == false
+        continue
+      endif
+
+      assign variant_options = variant.option1 | append: '||' | append: variant.option2 | append: '||' | append: variant.option3 | downcase
+      assign color_match = false
+      assign size_match = false
+
+      if variant_options contains bundle_trigger_color
+        assign color_match = true
+      endif
+      if variant_options contains bundle_trigger_size
+        assign size_match = true
+      endif
+
+      if color_match and size_match
+        assign bundle_variant = variant
+        break
+      endif
+    endfor
+
+    if bundle_variant == nil
+      assign bundle_variant = bundle_product.selected_or_first_available_variant
+    endif
+  endif
+-%}
+
+<section
+  class="viw"
+  id="VisionInTheWild-{{ section.id }}"
+  aria-labelledby="viw-heading-{{ section.id }}"
+  {% if bundle_variant != blank %}
+    data-viw-bundle-variant-id="{{ bundle_variant.id }}"
+  {% endif %}
+  data-viw-bundle-trigger-color="{{ section.settings.bundle_trigger_color | escape }}"
+  data-viw-bundle-trigger-size="{{ section.settings.bundle_trigger_size | escape }}"
+>
+  {%- if section.settings.heading != blank -%}
+    <h2 class="viw__heading" id="viw-heading-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+  {%- endif -%}
+
+  <div class="viw__grid">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign item_product = block.settings.product
+        assign item_image = block.settings.image
+        if item_image == blank and item_product != blank and item_product.featured_image != blank
+          assign item_image = item_product.featured_image
+        endif
+        assign spot_x = block.settings.spot_position_x
+        assign spot_y = block.settings.spot_position_y
+      -%}
+
+      <div class="viw__item" data-viw-item {{ block.shopify_attributes }}>
+        <div class="viw__media">
+          {%- if item_image != blank -%}
+            {{
+              item_image
+              | image_url: width: 800
+              | image_tag:
+                class: 'viw__image',
+                widths: '165, 360, 535, 750, 800',
+                sizes: '(min-width: 750px) 33vw, 50vw',
+                loading: 'lazy',
+                alt: item_product.title | default: '' | escape
+            }}
+          {%- else -%}
+            {{ 'product-apparel-1' | placeholder_svg_tag: 'viw__placeholder' }}
+          {%- endif -%}
+
+          {%- if item_product != blank -%}
+            <button
+              type="button"
+              class="viw__spot"
+              data-viw-open
+              style="left: {{ spot_x }}%; top: {{ spot_y }}%;"
+              aria-label="View {{ item_product.title | escape }}"
+            >
+              <span class="viw__spot-icon" aria-hidden="true"></span>
+            </button>
+          {%- endif -%}
+        </div>
+
+        {%- if item_product != blank -%}
+          {%- assign current_variant = item_product.selected_or_first_available_variant -%}
+          <div class="viw__popup" data-viw-popup hidden>
+            <div class="viw__popup-backdrop" data-viw-close tabindex="-1" aria-hidden="true"></div>
+            <div
+              class="viw__popup-panel"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="viw-popup-title-{{ block.id }}"
+            >
+              <button type="button" class="viw__popup-close" data-viw-close aria-label="{{ 'accessibility.close' | t }}">
+                <span aria-hidden="true">×</span>
+              </button>
+
+              <div class="viw__popup-header">
+                {%- if item_product.featured_image != blank -%}
+                  <div class="viw__popup-media">
+                    {{
+                      item_product.featured_image
+                      | image_url: width: 720, height: 840, crop: 'center'
+                      | image_tag:
+                        class: 'viw__popup-image',
+                        widths: '120, 240, 360, 540, 720',
+                        sizes: '120px',
+                        width: 120,
+                        height: 140,
+                        loading: 'eager',
+                        alt: item_product.featured_image.alt | default: item_product.title | escape
+                    }}
+                  </div>
+                {%- endif -%}
+
+                <div class="viw__popup-info">
+                  <h3 class="viw__popup-title" id="viw-popup-title-{{ block.id }}">{{ item_product.title | escape }}</h3>
+                  <p class="viw__popup-price" data-viw-price>{{ current_variant.price | money }}</p>
+
+                  {%- if item_product.description != blank -%}
+                    <p class="viw__popup-description">{{ item_product.description | strip_html }}</p>
+                  {%- endif -%}
+                </div>
+              </div>
+
+              {%- unless item_product.has_only_default_variant -%}
+                <div class="viw__variants">
+                  {%- for option in item_product.options_with_values -%}
+                    {%- liquid
+                      assign option_index = option.position | minus: 1
+                      assign option_name_downcase = option.name | downcase
+                      assign is_color_option = false
+                      assign is_size_option = false
+                      if option_name_downcase contains 'color' or option_name_downcase contains 'colour'
+                        assign is_color_option = true
+                      elsif option_name_downcase contains 'size'
+                        assign is_size_option = true
+                      endif
+                    -%}
+
+                    <div class="viw__variant{% if is_color_option %} viw__variant--color{% endif %}{% if is_size_option %} viw__variant--size{% endif %}">
+                      <p class="viw__variant-label">{{ option.name | escape }}</p>
+
+                      {%- if is_size_option -%}
+                        <div
+                          class="viw__size-picker"
+                          data-viw-size-picker
+                          data-option-index="{{ option_index }}"
+                        >
+                          <button
+                            type="button"
+                            class="viw__size-picker-trigger"
+                            data-viw-size-trigger
+                            aria-expanded="false"
+                            aria-haspopup="listbox"
+                            id="viw-size-trigger-{{ block.id }}-{{ option_index }}"
+                          >
+                            <span class="viw__size-picker-value is-placeholder" data-viw-size-display>
+                              Choose your size
+                            </span>
+                            <span class="viw__size-picker-chevron" aria-hidden="true"></span>
+                          </button>
+                          <ul
+                            class="viw__size-picker-list"
+                            data-viw-size-list
+                            role="listbox"
+                            aria-labelledby="viw-size-trigger-{{ block.id }}-{{ option_index }}"
+                            hidden
+                          >
+                            <li class="viw__size-picker-item viw__size-picker-item--placeholder" role="presentation">
+                              <span class="viw__size-picker-option is-placeholder">Choose your size</span>
+                            </li>
+                            {%- for value in option.values -%}
+                              <li class="viw__size-picker-item" role="presentation">
+                                <button
+                                  type="button"
+                                  class="viw__size-picker-option"
+                                  data-viw-size-option
+                                  data-option-index="{{ option_index }}"
+                                  data-value="{{ value | escape }}"
+                                  role="option"
+                                  aria-selected="false"
+                                >
+                                  {{ value | escape }}
+                                </button>
+                              </li>
+                            {%- endfor -%}
+                          </ul>
+                        </div>
+                      {%- else -%}
+                        <div class="viw__variant-options{% if is_color_option %} viw__variant-options--color{% endif %}">
+                          {%- for value in option.values -%}
+                            {%- liquid
+                              assign is_selected = false
+                              assign swatch_color = ''
+                              if value.swatch.color
+                                assign swatch_color = value.swatch.color
+                              endif
+                            -%}
+                            <button
+                              type="button"
+                              class="viw__variant-option{% if is_color_option %} viw__color-option{% endif %}{% if is_selected %} is-selected{% endif %}"
+                              data-viw-option
+                              data-option-index="{{ option_index }}"
+                              data-value="{{ value | escape }}"
+                              {% if swatch_color != blank %}
+                                data-swatch-color="{{ swatch_color }}"
+                              {% endif %}
+                              aria-pressed="{% if is_selected %}true{% else %}false{% endif %}"
+                            >
+                              {%- if is_color_option -%}
+                                <span class="viw__color-swatch" aria-hidden="true"></span>
+                              {%- endif -%}
+                              <span class="viw__variant-option-label">{{ value | escape }}</span>
+                            </button>
+                          {%- endfor -%}
+                        </div>
+                      {%- endif -%}
+                    </div>
+                  {%- endfor -%}
+                </div>
+              {%- endunless -%}
+
+              <form class="viw__form" data-viw-form>
+                <input
+                  type="hidden"
+                  name="id"
+                  value="{% if item_product.has_only_default_variant %}{{ current_variant.id }}{% endif %}"
+                >
+                <button
+                  type="submit"
+                  class="viw__submit"
+                  data-viw-submit
+                  data-add-label="{{ 'products.product.add_to_cart' | t | upcase }}"
+                  data-sold-out-label="{{ 'products.product.sold_out' | t | upcase }}"
+                  data-unavailable-label="{{ 'products.product.unavailable' | t | upcase }}"
+                  data-added-label="{{ 'actions.added' | t | upcase }}"
+                  {% if item_product.has_only_default_variant %}
+                    {% unless current_variant.available %}
+                      disabled
+                    {% endunless %}
+                  {% else %}
+                    disabled
+                  {% endif %}
+                >
+                  <span data-viw-submit-label>
+                    {%- if item_product.has_only_default_variant and current_variant.available == false -%}
+                      {{ 'products.product.sold_out' | t | upcase }}
+                    {%- else -%}
+                      {{ 'products.product.add_to_cart' | t | upcase }}
+                    {%- endif -%}
+                  </span>
+                  <span class="viw__submit-arrow" aria-hidden="true">→</span>
+                </button>
+              </form>
+
+              <script type="application/json" data-viw-product-json>
+                {
+                  "id": {{ item_product.id | json }},
+                  "options": {{ item_product.options | json }},
+                  "variants": {{ item_product.variants | json }}
+                }
+              </script>
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  @import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,400;0,500;0,600;0,700&display=swap');
+
+  .viw {
+    width: 100%;
+    padding: 2.5rem 1rem;
+    background: #fff;
+    font-family: 'Jost', sans-serif;
+    letter-spacing: 0;
+    box-sizing: border-box;
+  }
+
+  body.viw-popup-open {
+    overflow: hidden;
+  }
+
+  .viw__heading {
+    margin: 0 0 1.75rem;
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    font-weight: 400;
+    line-height: 1.2;
+    text-align: center;
+    color: #000;
+  }
+
+  .viw__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    width: 100%;
+    max-width: 177.75rem;
+    margin: 0 auto;
+  }
+
+  .viw__item {
+    min-width: 0;
+  }
+
+  .viw__media {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #f7f7f7;
+  }
+
+  .viw__image,
+  .viw__placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .viw__placeholder {
+    background: #f7f7f7;
+  }
+
+  .viw__spot {
+    position: absolute;
+    z-index: 2;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 50%;
+    background: #f8f8f8;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    transition: transform 0.2s ease;
+  }
+
+  .viw__spot:hover,
+  .viw__spot:focus-visible {
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+
+  .viw__spot-icon {
+    position: relative;
+    width: 0.625rem;
+    height: 0.625rem;
+  }
+
+  .viw__spot-icon::before,
+  .viw__spot-icon::after {
+    content: '';
+    position: absolute;
+    background: #000;
+  }
+
+  .viw__spot-icon::before {
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    transform: translateY(-50%);
+  }
+
+  .viw__spot-icon::after {
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    transform: translateX(-50%);
+  }
+
+  .viw__popup {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    box-sizing: border-box;
+  }
+
+  .viw__popup[hidden]:not(.is-open) {
+    display: none !important;
+  }
+
+  .viw__popup.is-open {
+    display: flex;
+  }
+
+  .viw__popup-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+  }
+
+  .viw__popup-panel {
+    position: relative;
+    z-index: 1;
+    width: 360px;
+    max-width: min(360px, calc(100vw - 2.5rem));
+    max-height: calc(100vh - 2.5rem);
+    overflow: auto;
+    overflow-x: hidden;
+    background: #fff;
+    padding: 16px;
+    box-sizing: border-box;
+    border: 1px solid #e3e3e3;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  }
+
+  .viw__popup-header,
+  .viw__variants,
+  .viw__form {
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
+  }
+
+  .viw__popup-close {
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    font-weight: 300;
+    line-height: 1;
+    cursor: pointer;
+    color: #000;
+    float: right;
+  }
+
+  .viw__popup-close span {
+    display: block;
+    line-height: 1;
+  }
+
+  .viw__popup-header {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+    margin-bottom: 16px;
+  }
+
+  .viw__popup-media {
+    width: 120px;
+    height: 140px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .viw__popup-image {
+    width: 120px;
+    height: 140px;
+    max-width: none;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    image-rendering: auto;
+  }
+
+  .viw__popup-info {
+    min-width: 0;
+    padding-right: 1.5rem;
+    padding-top: 12px;
+  }
+
+  .viw__popup-title {
+    margin: 0;
+    padding-right: 0.5rem;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 120%;
+    color: #000;
+  }
+
+  .viw__popup-price {
+    margin: 1.5rem 0 0;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 120%;
+    color: #000;
+  }
+
+  .viw__popup-description {
+    margin: 8px 0 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 110%;
+    color: #333;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .viw__variants {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 0;
+  }
+
+  .viw__variant--color {
+    order: 1;
+  }
+
+  .viw__variant--size {
+    order: 2;
+  }
+
+  .viw__variant:not(.viw__variant--color):not(.viw__variant--size) {
+    order: 3;
+  }
+
+  .viw__variant-label {
+    margin: 0 0 0.5rem;
+    font-size: 14px;
+    font-weight: 500;
+    color: #000;
+  }
+
+  .viw__variant-options {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+  }
+
+  .viw__variant-options--color {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0;
+    width: 100%;
+    border: 1px solid #000;
+    border-radius: 0;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .viw__variant-option {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.5rem 0.875rem;
+    border: 1px solid #d9d9d9;
+    background: #fff;
+    color: #000;
+    font-family: inherit;
+    font-size: 0.875rem;
+    letter-spacing: 0;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  .viw__variant-options--color .viw__color-option {
+    flex: 1 1 50%;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    width: auto;
+    min-width: 0;
+    justify-content: flex-start;
+    gap: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    color: #000;
+  }
+
+  .viw__variant-options--color .viw__color-option:not(:last-child) {
+    border-right: 1px solid #000;
+  }
+
+  .viw__color-swatch {
+    flex: 0 0 4px;
+    width: 4px;
+    margin: 0;
+    background: var(--viw-swatch-color, #ccc);
+    box-shadow: inset 0 0 0 1px rgb(0 0 0);
+  }
+
+  .viw__variant-options--color .viw__color-option.is-selected {
+    background: #000;
+    color: #fff;
+    font-weight: 500;
+  }
+
+  .viw__color-option .viw__variant-option-label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.5rem 0.75rem;
+    font-size: 18px;
+    line-height: 1.2;
+  }
+
+  .viw__variant-option:not(.viw__color-option).is-selected {
+    border-color: #000;
+    background: #f7f7f7;
+  }
+
+  .viw__variant-option:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .viw__size-picker {
+    position: relative;
+    width: 100%;
+  }
+
+  .viw__size-picker-trigger {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    min-height: 45px;
+    padding: 0;
+    border: 1px solid #000;
+    background: #fff;
+    color: #000;
+    font-family: inherit;
+    font-size: 16px;
+    letter-spacing: 0;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .viw__size-picker-trigger:focus-visible {
+    outline: 2px solid #000;
+    outline-offset: 0;
+  }
+
+  .viw__size-picker-value {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    padding: 0.625rem 0.875rem;
+  }
+
+  .viw__size-picker-value.is-placeholder {
+    color: #9e9e9e;
+  }
+
+  .viw__size-picker-chevron {
+    flex-shrink: 0;
+    width: 44px;
+    border-left: 1px solid #000;
+    position: relative;
+  }
+
+  .viw__size-picker-chevron::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin: -0.35rem 0 0 -0.25rem;
+    border-right: 1.5px solid #000;
+    border-bottom: 1.5px solid #000;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+  }
+
+  .viw__size-picker.is-open .viw__size-picker-chevron::after {
+    margin-top: -0.15rem;
+    transform: rotate(-135deg);
+  }
+
+  .viw__size-picker-list {
+    position: absolute;
+    z-index: 4;
+    top: calc(100% + 0);
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid #000;
+    border-top: none;
+    background: #fff;
+    box-sizing: border-box;
+  }
+
+  .viw__size-picker-item {
+    margin: 0;
+    padding: 0;
+  }
+
+  .viw__size-picker-item--placeholder {
+    pointer-events: none;
+  }
+
+  .viw__size-picker-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 45px;
+    padding: 0.625rem 0.875rem;
+    border: none;
+    background: #fff;
+    color: #000;
+    font-family: inherit;
+    font-size: 16px;
+    letter-spacing: 0;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .viw__size-picker-item--placeholder .viw__size-picker-option {
+    color: #9e9e9e;
+    cursor: default;
+  }
+
+  .viw__size-picker-option:hover:not(:disabled),
+  .viw__size-picker-option:focus-visible {
+    background: #f7f7f7;
+  }
+
+  .viw__size-picker-option:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .viw__size-picker-option[aria-selected='true'] {
+    background: #000;
+    color: #fff;
+  }
+
+  .viw__size-picker-option[aria-selected='true']:hover,
+  .viw__size-picker-option[aria-selected='true']:focus-visible {
+    background: #000;
+    color: #fff;
+  }
+
+  .viw__form {
+    margin: 60px 0 0;
+  }
+
+  .viw__submit {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: #000;
+    color: #fff;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    cursor: pointer;
+    overflow: hidden;
+    isolation: isolate;
+    transition: color 0.4s ease, opacity 0.2s ease;
+  }
+
+  .viw__submit::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: #f4e04d;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.4s ease;
+  }
+
+  .viw__submit [data-viw-submit-label],
+  .viw__submit-arrow {
+    position: relative;
+    z-index: 1;
+    transition: color 0.4s ease;
+  }
+
+  .viw__submit-arrow {
+    font-size: 1.125rem;
+    line-height: 1;
+    font-weight: 400;
+  }
+
+  .viw__submit:focus-visible::before {
+    transform: scaleX(1);
+  }
+
+  .viw__submit:focus-visible {
+    color: #000;
+  }
+
+  @media (hover: hover) {
+    .viw__submit:hover:not(:disabled)::before {
+      transform: scaleX(1);
+    }
+
+    .viw__submit:hover:not(:disabled) {
+      color: #000;
+    }
+  }
+
+  .viw__submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .viw__submit:disabled::before {
+    display: none;
+  }
+
+  @media screen and (min-width: 750px) {
+    .viw {
+      padding: 3rem clamp(2rem, 5vw, 4rem);
+    }
+
+    .viw__heading {
+      margin-bottom: 2.25rem;
+      text-align: left;
+    }
+
+    .viw__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+    }
+
+    .viw__spot {
+      width: 22px;
+      height: 22px;
+    }
+
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Vision in the wild",
+  "tag": "section",
+  "class": "vision-in-the-wild-section",
+  "max_blocks": 6,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Tisso vison in the wild"
+    },
+    {
+      "type": "header",
+      "content": "Bundle add to cart"
+    },
+    {
+      "type": "paragraph",
+      "content": "When a shopper adds a product with the trigger color and size, the bundle product is added automatically in the same request."
+    },
+    {
+      "type": "product",
+      "id": "bundle_product",
+      "label": "Auto-add product",
+      "info": "Automatically added when Black and Medium variants are selected (e.g. Soft Winter Jacket)."
+    },
+    {
+      "type": "text",
+      "id": "bundle_trigger_color",
+      "label": "Trigger color value",
+      "default": "Black"
+    },
+    {
+      "type": "text",
+      "id": "bundle_trigger_size",
+      "label": "Trigger size value",
+      "default": "Medium"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Grid item",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image",
+          "info": "Optional. Uses product featured image if empty."
+        },
+        {
+          "type": "header",
+          "content": "Hotspot position"
+        },
+        {
+          "type": "range",
+          "id": "spot_position_x",
+          "label": "Horizontal position",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "spot_position_y",
+          "label": "Vertical position",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "default": 50
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vision in the wild",
+      "blocks": [
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" },
+        { "type": "item" }
+      ]
+    }
+  ]
+}
+{% endschema %}
